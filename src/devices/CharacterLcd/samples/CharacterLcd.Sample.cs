@@ -4,6 +4,8 @@
 
 using System.Device.I2c;
 using System.Device.I2c.Drivers;
+using System.Diagnostics;
+using System.Threading;
 using Iot.Device.Mcp23xxx;
 
 namespace Iot.Device.CharacterLcd.Samples
@@ -17,10 +19,23 @@ namespace Iot.Device.CharacterLcd.Samples
         static void Main(string[] args)
         {
             // Sets up a 16x2 character LCD with a hardwired or no backlight.
-            using (Lcd1602 lcd = new Lcd1602(registerSelect: 1, enable: 2, data: new int[] { 3, 4, 5, 6 }))
+            using (Lcd2004 lcd = new Lcd2004(registerSelect: 22, enable: 17, data: new int[] { 25, 24, 23, 18 }))
             {
                 lcd.Clear();
                 lcd.Write("Hello World");
+                lcd.SetCursorPosition(0, 1);
+                lcd.Write(".NET Core!");
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                while (sw.ElapsedMilliseconds < 20_000)
+                {
+                    lcd.SetCursorPosition(0,2);
+                    lcd.Write($"{(sw.ElapsedMilliseconds/1000.0):0.000} seconds");
+                    Thread.Sleep(10);
+                }
+                lcd.Clear();
+                lcd.Home();
+                lcd.Write("Goodbye!");
             }
         }
 

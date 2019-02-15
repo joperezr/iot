@@ -131,7 +131,7 @@ namespace System.Device.Gpio.Tests
         public void AddCallbackTest()
         {
             while (!Debugger.IsAttached)
-                Thread.Sleep(1000);
+                Thread.Sleep(10_000);
             Debugger.Break();
 
             ManualResetEvent mre = new ManualResetEvent(false);
