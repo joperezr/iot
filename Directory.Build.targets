@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.GenAPI.Task" PrivateAssets="All" Version="$(MicrosoftDotNetGenAPITaskPackageVersion)" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- If the project is packable, we generate its API surface in a separate file to be used by the API review process. -->
+    <GenAPITargetPath Condition="'$(IsPackable)' == 'true'">$(MSBuildProjectDirectory)/api/$(AssemblyName).cs</GenAPITargetPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="$(GenAPITargetPath)" />
+  </ItemGroup>
+
+  <Target Name="CreateGenAPITargetPathFolder" BeforeTargets="GenAPIGenerateReferenceAssemblySource">
+    <MakeDir Directories="$(MSBuildProjectDirectory)/api" Condition="!Exists('$(MSBuildProjectDirectory)/api')" />
+  </Target>
+
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
 </Project>
