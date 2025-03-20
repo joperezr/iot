@@ -32,6 +32,11 @@ namespace System.Device
 
 namespace System.Device.Gpio
 {
+    public partial record GpioChipInfo(int Id, string Name, string Label, int NumLines)
+    {
+        public override string ToString() { throw null; }
+    }
+
     public partial class GpioController : IDisposable
     {
         public GpioController() { }
@@ -114,6 +119,8 @@ namespace System.Device.Gpio
 
         ~GpioDriver() {
         }
+
+        public virtual GpioChipInfo GetChipInfo() { throw null; }
 
         protected internal abstract PinMode GetPinMode(int pinNumber);
         protected internal abstract bool IsPinModeSupported(int pinNumber, PinMode mode);
@@ -266,15 +273,9 @@ namespace System.Device.Gpio.Drivers
 
     public partial class LibGpiodDriver : UnixDriver
     {
-        [Diagnostics.CodeAnalysis.Experimental("SDGPIO0001", UrlFormat = "https://aka.ms/dotnet-iot-warnings/{0}")]
-        public LibGpiodDriver(int gpioChip, LibGpiodDriverVersion driverVersion) { }
-
         public LibGpiodDriver(int gpioChip = 0) { }
 
         protected internal override int PinCount { get { throw null; } }
-
-        [Diagnostics.CodeAnalysis.Experimental("SDGPIO0001", UrlFormat = "https://aka.ms/dotnet-iot-warnings/{0}")]
-        public LibGpiodDriverVersion Version { get { throw null; } protected set { } }
 
         protected internal override void AddCallbackForPinValueChangedEvent(int pinNumber, PinEventTypes eventTypes, PinChangeEventHandler callback) { }
 
@@ -284,8 +285,9 @@ namespace System.Device.Gpio.Drivers
 
         protected override void Dispose(bool disposing) { }
 
-        [Diagnostics.CodeAnalysis.Experimental("SDGPIO0001", UrlFormat = "https://aka.ms/dotnet-iot-warnings/{0}")]
-        public static LibGpiodDriverVersion[] GetAvailableVersions() { throw null; }
+        public static Collections.Generic.IList<GpioChipInfo> GetAvailableChips() { throw null; }
+
+        public override GpioChipInfo GetChipInfo() { throw null; }
 
         protected internal override PinMode GetPinMode(int pinNumber) { throw null; }
 
@@ -308,13 +310,6 @@ namespace System.Device.Gpio.Drivers
         protected internal override WaitForEventResult WaitForEvent(int pinNumber, PinEventTypes eventTypes, Threading.CancellationToken cancellationToken) { throw null; }
 
         protected internal override void Write(int pinNumber, PinValue value) { }
-    }
-
-    [Diagnostics.CodeAnalysis.Experimental("SDGPIO0001", UrlFormat = "https://aka.ms/dotnet-iot-warnings/{0}")]
-    public enum LibGpiodDriverVersion
-    {
-        V1 = 0,
-        V2 = 1
     }
 
     public partial class RaspberryPi3Driver : GpioDriver
@@ -379,6 +374,10 @@ namespace System.Device.Gpio.Drivers
 
     public partial class SysFsDriver : UnixDriver
     {
+        public SysFsDriver() { }
+
+        public SysFsDriver(int chip) { }
+
         protected internal override int PinCount { get { throw null; } }
 
         protected internal override void AddCallbackForPinValueChangedEvent(int pinNumber, PinEventTypes eventTypes, PinChangeEventHandler callback) { }
@@ -388,6 +387,10 @@ namespace System.Device.Gpio.Drivers
         protected internal override int ConvertPinNumberToLogicalNumberingScheme(int pinNumber) { throw null; }
 
         protected override void Dispose(bool disposing) { }
+
+        public static Collections.Generic.IList<GpioChipInfo> GetAvailableChips() { throw null; }
+
+        public override GpioChipInfo GetChipInfo() { throw null; }
 
         protected internal override PinMode GetPinMode(int pinNumber) { throw null; }
 
@@ -411,6 +414,54 @@ namespace System.Device.Gpio.Drivers
     public abstract partial class UnixDriver : GpioDriver
     {
         public static UnixDriver Create() { throw null; }
+    }
+}
+
+namespace System.Device.Gpio.Drivers.Libgpiod.V2
+{
+    [Diagnostics.CodeAnalysis.Experimental("SDGPIO0001", UrlFormat = "https://aka.ms/dotnet-iot-warnings/{0}")]
+    public sealed partial class LibGpiodV2Driver : UnixDriver
+    {
+        public LibGpiodV2Driver(int chipNumber, TimeSpan? waitEdgeEventsTimeout = null) { }
+
+        protected internal override int PinCount { get { throw null; } }
+
+        protected internal override void AddCallbackForPinValueChangedEvent(int lineOffset, PinEventTypes eventTypes, PinChangeEventHandler callback) { }
+
+        protected internal override void ClosePin(int lineOffset) { }
+
+        protected internal override int ConvertPinNumberToLogicalNumberingScheme(int lineOffset) { throw null; }
+
+        protected override void Dispose(bool disposing) { }
+
+        public static Collections.Generic.IList<GpioChipInfo> GetAvailableChips() { throw null; }
+
+        public override GpioChipInfo GetChipInfo() { throw null; }
+
+        protected internal override PinMode GetPinMode(int lineOffset) { throw null; }
+
+        protected internal override bool IsPinModeSupported(int lineOffset, PinMode mode) { throw null; }
+
+        protected internal override void OpenPin(int lineOffset) { }
+
+        protected internal override PinValue Read(int lineOffset) { throw null; }
+
+        protected internal override void RemoveCallbackForPinValueChangedEvent(int lineOffset, PinChangeEventHandler callback) { }
+
+        protected internal override void SetPinMode(int lineOffset, PinMode mode) { }
+
+        protected internal override WaitForEventResult WaitForEvent(int lineOffset, PinEventTypes eventTypes, Threading.CancellationToken cancellationToken) { throw null; }
+
+        protected internal override void Write(int lineOffset, PinValue value) { }
+    }
+}
+
+namespace System.Device.Gpio.System.Device.Gpio.Drivers.Libgpiod.V1
+{
+    [Diagnostics.CodeAnalysis.Experimental("SDGPIO0001", UrlFormat = "https://aka.ms/dotnet-iot-warnings/{0}")]
+    public partial class LibGpiodV1Driver : global::System.Device.Gpio.Drivers.LibGpiodDriver
+    {
+        public LibGpiodV1Driver(int chip = 0) : base(default) { }
     }
 }
 
